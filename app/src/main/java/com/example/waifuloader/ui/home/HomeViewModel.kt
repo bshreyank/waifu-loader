@@ -14,7 +14,9 @@ import javax.inject.Inject
 
 
 data class HomeUiState(
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val imageUrl: String? = null,
+    val error: String? = null
 )
 
 @HiltViewModel
@@ -25,7 +27,7 @@ class HomeViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     fun getWaifu() {
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
             val result = waifuRepository.getWaifuInfo()
@@ -33,14 +35,25 @@ class HomeViewModel @Inject constructor(
             when (result) {
                 is NetworkResult.Success -> {
                     Log.d(TAG, "image data: ${result.data}")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            imageUrl = result.data.url,
+                            error = null
+                        )
+                    }
                 }
 
                 is NetworkResult.Error -> {
                     Log.d(TAG, "error: ${result.message} code: ${result.code}")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = result.message
+                        )
+                    }
                 }
             }
-
-            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
