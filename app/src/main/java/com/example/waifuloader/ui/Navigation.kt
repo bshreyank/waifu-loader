@@ -8,3 +8,9 @@ data object HomeRoute
 
 @Serializable
 data object SavedRoute
+
+@Serializable
+data object FavoritesRoute
+
+@Serializable
+data object SettingsRoute

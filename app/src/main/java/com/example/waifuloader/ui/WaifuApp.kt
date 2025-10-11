@@ -12,17 +12,25 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.waifuloader.ui.favorites.FavoritesScreen
 import com.example.waifuloader.ui.home.HomeScreen
 import com.example.waifuloader.ui.saved.SavedScreen
+import com.example.waifuloader.ui.settings.SettingsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WaifuApp(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
 
-    Scaffold(topBar = {
-        TopAppBar(title = { Text(text = "Waifu Loader") })
-    }) { innerPadding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(text = "Waifu Loader") })
+        },
+        bottomBar = {
+            BottomNavigationBar(navController = navController)
+        }
+    )
+    { innerPadding ->
         Box(
             modifier = Modifier
                 .padding(innerPadding)
@@ -38,6 +46,14 @@ fun WaifuApp(modifier: Modifier = Modifier) {
                     SavedScreen(onBack = {
                         navController.navigateUp()
                     })
+                }
+
+                composable <FavoritesRoute> {
+                    FavoritesScreen()
+                }
+
+                composable<SettingsRoute> {
+                    SettingsScreen()
                 }
             }
         }
