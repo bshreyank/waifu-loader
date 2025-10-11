@@ -43,7 +43,8 @@ android {
 }
 
 dependencies {
-    implementation("androidx.compose.foundation:foundation:1.5.0+") // or newer
+    implementation("androidx.compose.foundation:foundation:1.9.3")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
     //retrofit
     val retrofitVersion = "2.11.0"
