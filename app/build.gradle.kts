@@ -43,6 +43,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.foundation:foundation:1.5.0+") // or newer
+
     //retrofit
     val retrofitVersion = "2.11.0"
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")

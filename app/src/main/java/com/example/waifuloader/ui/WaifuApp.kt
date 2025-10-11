@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.waifuloader.ui.favorites.FavoritesScreen
 import com.example.waifuloader.ui.home.HomeScreen
 import com.example.waifuloader.ui.saved.SavedScreen
+import com.example.waifuloader.ui.settings.SettingsRoute
 import com.example.waifuloader.ui.settings.SettingsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,7 +54,7 @@ fun WaifuApp(modifier: Modifier = Modifier) {
                 }
 
                 composable<SettingsRoute> {
-                    SettingsScreen()
+                    SettingsRoute()
                 }
             }
         }
