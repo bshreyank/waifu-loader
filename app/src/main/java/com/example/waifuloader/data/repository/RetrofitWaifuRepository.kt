@@ -1,8 +1,8 @@
 package com.example.waifuloader.data.repository
 
 import com.example.waifuloader.data.WaifuRepository
-import com.example.waifuloader.data.models.Waifu
 import com.example.waifuloader.data.models.NetworkResult
+import com.example.waifuloader.data.models.Waifu
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -19,7 +19,8 @@ import javax.inject.Inject
 private interface NetworkApi {
     @GET("/search")
     suspend fun getWaifu(
-        @Query("included_tags") tag: String
+        // Retrofit handles List<String> as multiple query params: ?included_tags=maid&included_tags=waifu
+        @Query("included_tags") tags: List<String>
     ): Response<ResponseBody>
 }
 
@@ -36,9 +37,10 @@ class RetrofitWaifuRepository @Inject constructor(
         .build()
         .create(NetworkApi::class.java)
 
-    override suspend fun getWaifuInfo(): NetworkResult<Waifu> {
+    override suspend fun getWaifuInfo(tags: List<String>): NetworkResult<Waifu> {
         return try {
-            val response = networkApi.getWaifu(tag = "maid")
+            // 1. Send the selected tags to the API
+            val response = networkApi.getWaifu(tags = tags)
 
             if (response.isSuccessful) {
                 val body = response.body()?.string()
@@ -49,14 +51,14 @@ class RetrofitWaifuRepository @Inject constructor(
                     )
                 }
 
-                // Parse JSON manually with kotlinx.serialization.Json
+                // Parse JSON manually
                 val jsonElement = networkJson.parseToJsonElement(body)
                 val imagesArray = jsonElement.jsonObject["images"]?.jsonArray
 
                 if (imagesArray.isNullOrEmpty()) {
                     return NetworkResult.Error(
                         code = response.code(),
-                        message = "No images found"
+                        message = "No images found for these tags"
                     )
                 }
 
@@ -65,14 +67,20 @@ class RetrofitWaifuRepository @Inject constructor(
                 val imageId = imageObj["image_id"]?.toString()?.trim('"') ?: ""
                 val url = imageObj["url"]?.toString()?.trim('"') ?: ""
 
+                // 2. Extract tags from the response to display or verify
+                val tagsArray = imageObj["tags"]?.jsonArray
+                val loadedTags = tagsArray?.mapNotNull {
+                    it.jsonObject["name"]?.toString()?.trim('"')
+                } ?: emptyList()
+
                 val waifu = Waifu(
                     id = imageId,
-                    url = url
+                    url = url,
+                    tags = loadedTags
                 )
 
                 NetworkResult.Success(waifu)
             } else {
-                // HTTP-level error
                 NetworkResult.Error(
                     code = response.code(),
                     message = response.errorBody()?.string() ?: "Unknown error"
@@ -80,7 +88,6 @@ class RetrofitWaifuRepository @Inject constructor(
             }
 
         } catch (e: Exception) {
-            // Network or parsing exception
             NetworkResult.Error(
                 code = -1,
                 message = e.message ?: "Unexpected error"

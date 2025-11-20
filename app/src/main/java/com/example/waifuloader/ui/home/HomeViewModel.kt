@@ -3,6 +3,7 @@ package com.example.waifuloader.ui.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.waifuloader.data.UserPreferences
 import com.example.waifuloader.data.WaifuRepository
 import com.example.waifuloader.data.models.NetworkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,16 +24,31 @@ class HomeViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val result = waifuRepository.getWaifuInfo()
+            // 1. Get the list of all enabled tags
+            val allEnabledTags = UserPreferences.enabledTags.value.toList()
+
+            // 2. CRITICAL FIX: Pick ONE random tag to avoid the "AND" strict filtering.
+            // If the list is empty, we send an empty list (API returns random image).
+            val searchTags = if (allEnabledTags.isNotEmpty()) {
+                listOf(allEnabledTags.random())
+            } else {
+                emptyList()
+            }
+
+            Log.d(TAG, "Fetching waifu using random tag from preferences: $searchTags")
+
+            val result = waifuRepository.getWaifuInfo(tags = searchTags)
 
             when (result) {
                 is NetworkResult.Success -> {
-                    Log.d(TAG, "image data: ${result.data}")
+                    Log.d(TAG, "Image loaded. Tags: ${result.data.tags}")
                     _uiState.update { it.copy(currentWaifu = result.data) }
                 }
 
                 is NetworkResult.Error -> {
-                    Log.d(TAG, "error: ${result.message} code: ${result.code}")
+                    Log.d(TAG, "Error: ${result.message} code: ${result.code}")
+                    // If error is 404, it might be a rare tag with no images.
+                    // You could recursively call getWaifu() here to try another tag automatically.
                 }
             }
 
