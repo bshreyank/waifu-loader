@@ -48,7 +48,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateToSaved: () -> Unit
+    onNavigateToSaved: () -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     val waifuStore = LocalWaifuStore.current
     val currentWaifu by waifuStore.currentWaifu.collectAsState()
@@ -61,6 +62,7 @@ fun HomeRoute(
         onGetWaifu = { viewModel.getWaifu() },
         onNewWaifuLoaded = { waifu -> waifuStore.setCurrentWaifu(waifu) },
         onNavigateToSaved = onNavigateToSaved,
+        onNavigateToSettings = onNavigateToSettings,
         onSaveWaifu = { waifu -> waifuStore.saveWaifu(waifu) }
     )
 }
@@ -71,6 +73,7 @@ fun HomeScreen(
     currentWaifu: Waifu,
     onGetWaifu: () -> Unit,
     onNewWaifuLoaded: (Waifu) -> Unit,
+    onNavigateToSettings: () -> Unit,
     onNavigateToSaved: () -> Unit,
     onSaveWaifu: (Waifu) -> Unit,
 ) {
@@ -163,8 +166,8 @@ fun HomeScreen(
                 }
 
                 FloatingActionButton(onClick = {
-//                    TODO: Navigate to settings page.
                     Log.d(TAG, " Navigated to Settings Page.")
+                    onNavigateToSettings()
                 }) {
                     Icon(Icons.Default.Settings, contentDescription = "Settings page.")
                 }

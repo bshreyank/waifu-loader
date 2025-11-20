@@ -11,3 +11,6 @@ data object SavedWaifuGridRoute
 
 @Serializable
 data class SavedWaifuRoute(val id: String)
+
+@Serializable
+data object SettingsRoute

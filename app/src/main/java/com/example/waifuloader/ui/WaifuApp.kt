@@ -15,6 +15,7 @@ import androidx.navigation.toRoute
 import com.example.waifuloader.ui.home.HomeRoute
 import com.example.waifuloader.ui.saved.SavedWaifuGridRoute
 import com.example.waifuloader.ui.saved.SavedWaifuRoute
+import com.example.waifuloader.ui.settings.SettingsRoute
 
 
 val LocalWaifuStore = staticCompositionLocalOf<WaifuStore> { error("No Waifu store provided.") }
@@ -37,6 +38,9 @@ fun WaifuApp() {
                     HomeRoute(
                         onNavigateToSaved = {
                             navController.navigate(SavedWaifuGridRoute)
+                        },
+                        onNavigateToSettings = {
+                            navController.navigate(SettingsRoute)
                         }
                     )
                 }
@@ -58,6 +62,12 @@ fun WaifuApp() {
                     SavedWaifuRoute(
                         id = route.id,
                         onBackClick = { navController.popBackStack() },
+                    )
+                }
+
+                composable<SettingsRoute>{
+                    SettingsRoute(
+                        onBackClick = { navController.popBackStack() }
                     )
                 }
             }

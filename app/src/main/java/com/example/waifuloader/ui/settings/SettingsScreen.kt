@@ -6,6 +6,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 //import androidx.compose.material.icons.Icons
 //import androidx.compose.material.icons.filled.DarkMode
 //import androidx.compose.material.icons.filled.LightMode
@@ -22,11 +25,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun SettingsRoute(
-    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: SettingsViewModel = hiltViewModel(),
+    onBackClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     SettingsScreen(
         uiState = uiState,
+        onBackClick = onBackClick,
         onThemeToggle = viewModel::toggleTheme,
         onTagToggle = viewModel::toggleTag
     )
@@ -36,6 +41,7 @@ fun SettingsRoute(
 @Composable
 fun SettingsScreen(
     uiState: SettingsUiState,
+    onBackClick: () -> Unit,
     onThemeToggle: () -> Unit,
     onTagToggle: (String) -> Unit
 ) {
@@ -55,19 +61,24 @@ fun SettingsScreen(
         ) {
             // Header
             item {
-                Column(modifier = Modifier.padding(bottom = 8.dp)) {
-                    Text(
-                        "Settings",
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = if (uiState.isDarkMode) Color.White else Color(0xFF1A1A1A)
-                    )
-                    Text(
-                        "Customize your experience",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (uiState.isDarkMode) Color(0xFFB0B0B0) else Color(0xFF666666)
-                    )
+                Row() {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                    Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                        Text(
+                            "Settings",
+                            style = MaterialTheme.typography.headlineLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = if (uiState.isDarkMode) Color.White else Color(0xFF1A1A1A)
+                        )
+                        Text(
+                            "Customize your experience",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = if (uiState.isDarkMode) Color(0xFFB0B0B0) else Color(0xFF666666)
+                        )
+                    }
                 }
             }
 
@@ -107,12 +118,16 @@ fun SettingsScreen(
                                         style = MaterialTheme.typography.titleMedium.copy(
                                             fontWeight = FontWeight.SemiBold
                                         ),
-                                        color = if (uiState.isDarkMode) Color.White else Color(0xFF1A1A1A)
+                                        color = if (uiState.isDarkMode) Color.White else Color(
+                                            0xFF1A1A1A
+                                        )
                                     )
                                     Text(
                                         if (uiState.isDarkMode) "Dark mode" else "Light mode",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = if (uiState.isDarkMode) Color(0xFFB0B0B0) else Color(0xFF666666)
+                                        color = if (uiState.isDarkMode) Color(0xFFB0B0B0) else Color(
+                                            0xFF666666
+                                        )
                                     )
                                 }
                             }
@@ -313,7 +328,8 @@ fun SettingsScreenPreview_Light() {
             )
         ),
         onThemeToggle = {},
-        onTagToggle = {}
+        onTagToggle = {},
+        onBackClick = {}
     )
 }
 
@@ -339,6 +355,7 @@ fun SettingsScreenPreview_Dark() {
             )
         ),
         onThemeToggle = {},
-        onTagToggle = {}
+        onTagToggle = {},
+        onBackClick = {},
     )
 }
